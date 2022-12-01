@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
-
     private final ChatRepository chatRepository;
 
+    // 귓속말
     @CrossOrigin
     @GetMapping(value = "/sender/{sender}/receiver/{receiver}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Chat> getMsg(@PathVariable String sender, @PathVariable String receiver) {
@@ -27,5 +27,12 @@ public class ChatController {
     public Mono<Chat> setMsg(@RequestBody Chat chat) {
         chat.setCreatedAt(LocalDateTime.now());
         return chatRepository.save(chat);
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/chat/roomNum/{roomNum}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Chat> getChatRoom(@PathVariable Integer roomNum) {
+        return chatRepository.mFindByRoomNum(roomNum)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }
